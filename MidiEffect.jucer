@@ -5,6 +5,8 @@
               pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="pzLAxW" name="MidiEffect">
     <GROUP id="{818FEFCD-2121-428E-DB0B-196769C0D3E8}" name="Source">
+      <FILE id="oi6xDq" name="NoteAlteration.h" compile="0" resource="0"
+            file="Source/NoteAlteration.h"/>
       <FILE id="dOvIYU" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="wRzyL8" name="PluginProcessor.h" compile="0" resource="0"

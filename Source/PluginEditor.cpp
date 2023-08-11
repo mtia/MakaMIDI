@@ -15,7 +15,27 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    addAndMakeVisible(loadBtn);
+    loadBtn.setButtonText("Load scale");
+    loadBtn.onClick = [this]{
+        fileChooser = std::make_unique<juce::FileChooser>("Choose a file",
+            audioProcessor.root,
+            "*");
+
+        const auto fileChooserFlags = juce::FileBrowserComponent::openMode
+            | juce::FileBrowserComponent::canSelectFiles
+            | juce::FileBrowserComponent::canSelectDirectories;
+
+        fileChooser->launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser) {
+            juce::File chosenFile(chooser.getResult());
+            if (chosenFile.getFileExtension() == ".csv") {
+                audioProcessor.savedFile = chosenFile;
+                audioProcessor.root = chosenFile.getParentDirectory().getFullPathName();
+                audioProcessor.readScale(chosenFile);
+            }
+        });
+    };
+    setSize (600, 400);
 }
 
 MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
@@ -37,4 +57,10 @@ void MidiEffectAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    const auto btnX = getWidth() * JUCE_LIVE_CONSTANT(0.25);
+    const auto btnY = getHeight() * JUCE_LIVE_CONSTANT(0.5);
+    const auto btnWidth = getWidth() * JUCE_LIVE_CONSTANT(0.1);
+    const auto btnHeight = btnWidth * 0.5;
+
+    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
 }

@@ -8,6 +8,18 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "MidiProcessor.h"
+
+int MidiEffectAudioProcessor::commasToPitchBend(String commas) {
+    if (commas == "NaN")
+        return std::numeric_limits<int>::quiet_NaN();
+
+    int pitchWheelValue = commas.getIntValue() * 16384 / 9;
+    if (pitchWheelValue >= 0 || pitchWheelValue < 16384)
+       return commas.getIntValue();
+
+    DBG("INVALID PITCH DATA: " << commas);
+}
 
 //==============================================================================
 MidiEffectAudioProcessor::MidiEffectAudioProcessor()
@@ -90,11 +102,55 @@ void MidiEffectAudioProcessor::changeProgramName (int index, const juce::String&
 {
 }
 
-//==============================================================================
+//============================================================================== 
+
+void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
+{
+    if (!fileToRead.existsAsFile()) {
+        DBG("File not found");
+        return;
+    }
+
+    juce::FileInputStream inputStream(fileToRead); 
+
+    if (!inputStream.openedOk())
+    {
+        DBG("\nFailed to open file\n");
+        return;
+    }
+
+    if (alterations.size() > 0)
+        alterations.clear();
+
+    for (int i = 0; i < 128; i++)
+    {
+        alterations.add(0);
+    }
+
+    while (!inputStream.isExhausted())
+    {
+        auto line = inputStream.readNextLine();
+
+        int noteNumber = line.upToFirstOccurrenceOf(",", false, true).getIntValue();
+        DBG(noteNumber);
+
+        String altStr = line.fromFirstOccurrenceOf(",", false, true).upToFirstOccurrenceOf(",", false, true);
+        alterations.set(noteNumber, commasToPitchBend(altStr));
+    }
+
+    /*for (int i = 0; i < 128; i++)
+    {
+        DBG("Note number: " << i << " \talteration " << alterations[i]);
+    }*/
+
+}
+
 void MidiEffectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    juce::File defaultFile("D:/Documents/JUCE\ Projex/MidiEffect/Saba.csv");
+    readScale(defaultFile);
 }
 
 void MidiEffectAudioProcessor::releaseResources()
@@ -132,7 +188,7 @@ bool MidiEffectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 void MidiEffectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     buffer.clear(); // silence any possible disturbance
-    midiProcessor.process(midiMessages);
+    midiProcessor.process(midiMessages, &pitchWheelValue, &pitchCorrection, alterations, &activeNoteNumber);
 }
 
 //==============================================================================

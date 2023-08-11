@@ -12,6 +12,7 @@
 #include "MidiProcessor.h"
 
 //==============================================================================
+
 /**
 */
 class MidiEffectAudioProcessor  : public juce::AudioProcessor
@@ -25,6 +26,7 @@ public:
     ~MidiEffectAudioProcessor() override;
 
     //==============================================================================
+    void readScale(const juce::File& fileToRead);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -57,8 +59,16 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    int commasToPitchBend(String commas);
+    //juce::AudioProcessorValueTreeState apvts;
+    juce::File root, savedFile;
+    int pitchWheelValue = 8192;
+    int pitchCorrection = 0;
+    int activeNoteNumber = -1;
+
 private:
     MidiProcessor midiProcessor;
+    juce::Array<int> alterations;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessor)
 };
