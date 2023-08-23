@@ -65,6 +65,7 @@ public:
     int pitchWheelValue = 8192;
     int pitchCorrection = 0;
     int activeNoteNumber = -1;
+    bool exclusive = false;
 
 private:
     MidiProcessor midiProcessor;
