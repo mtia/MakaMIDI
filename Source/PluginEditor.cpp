@@ -24,7 +24,7 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     loadBtn.setButtonText("Load scale");
-    loadBtn.onClick = [this]{
+    loadBtn.onClick = [this](){
         fileChooser = std::make_unique<juce::FileChooser>("Choose a file",
             audioProcessor.root,
             "*");
@@ -39,8 +39,12 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
                 audioProcessor.savedFile = chosenFile;
                 audioProcessor.root = chosenFile.getParentDirectory().getFullPathName();
                 audioProcessor.readScale(chosenFile);
+                
+                updateBoxes(&audioProcessor);
+
             }
         });
+
     };
 
     exModeBtn.setButtonText("Exclusive");
@@ -117,4 +121,25 @@ void MidiEffectAudioProcessorEditor::resized()
         lowButtons[i]->setBounds(lowBounds.removeFromLeft(boxWidth));
     }
 
+}
+
+// once a scale file has been read, this function updates the ComboBoxes on the GUI
+void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
+{
+    // boxnum counts how many notes the scale is using, a maximum of 10 is shown
+    int boxnum = 0;
+
+    // for each noteNumber
+    for (int i = 0; i < 128; i++)
+    {
+        // if there is a record in the alterations
+        if (p->alterations[i]!=std::numeric_limits<int>::max()) {
+            //DBG("Alterations[" << String(i) << "]: " << String(p->alterations[i]));
+            // fill a ComboBox with the corresponding couple note+alteration
+            lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);
+            boxnum++;
+        }
+        if (boxnum > 9)
+            break;
+    }
 }

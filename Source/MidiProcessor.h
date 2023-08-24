@@ -26,7 +26,7 @@ public:
 
     int getPitchCorrection(int noteNumber, const juce::Array<int> &alterations)
     {
-        if (std::isnan((float)alterations[noteNumber]))
+        if (alterations[noteNumber]==std::numeric_limits<int>::max())
             return 0;
         return juce::roundToInt(alterations[noteNumber]*8192/9);
     }

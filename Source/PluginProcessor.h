@@ -66,10 +66,10 @@ public:
     int pitchCorrection = 0;
     int activeNoteNumber = -1;
     bool exclusive = false;
+    juce::Array<int> alterations;
 
 private:
     MidiProcessor midiProcessor;
-    juce::Array<int> alterations;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessor)
 };

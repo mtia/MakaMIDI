@@ -11,10 +11,13 @@
 #pragma once
 #include "JuceHeader.h"
 
-struct LowBox : juce::Component
+class LowBox : public juce::Component
 {
+public:
+
     LowBox()
     {
+
         note = new ComboBox();
         alteration = new ComboBox();
         toggle = new ToggleButton();
@@ -27,6 +30,7 @@ struct LowBox : juce::Component
 
         note->addItemList(midiNotes,1);
         alteration->addItemList(alterationsInCommas,1);
+
         toggle->setClickingTogglesState(true);
         toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
         toggle->onClick = [this] { toggleClicked(); };
@@ -61,6 +65,32 @@ struct LowBox : juce::Component
         }
     };
 
+    // change the content of the box
+    void setAlteration(String noteName, int newAlteration)
+    {
+        note->setText(noteName);
+
+        String * stringAlt = new String();
+        if (newAlteration > 0)
+            stringAlt->append("+", 1);
+        stringAlt->append(String(newAlteration), 2);
+        alteration->setText(*stringAlt);
+    }
+
+    static std::vector<String> getNoteNames()
+    {
+        return {
+            "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
+        };
+    }
+
+    static String noteNumberToName(int number)
+    {
+        std::vector<String> noteNames = {
+            "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
+        };
+        return noteNames[number % 12] + String(std::floor((number + 12) / 12));
+    }
 
 private:
     juce::ComboBox* note;
@@ -72,13 +102,13 @@ private:
 
     juce::StringArray listMIDINotes()
     {
-        StringArray names = {
+        std::vector<String> noteNames = {
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
         };
 
         StringArray output;
         for (int i = 0; i < 115; i++) {
-            output.add(names[i % 12] + String(std::floor((i + 12) / 12)));
+            output.add(noteNames[i % 12] + String(std::floor((i + 12) / 12)));
         }
 
         return output;
@@ -97,4 +127,5 @@ private:
         }
         return output;
     }
+
 };

@@ -9,16 +9,21 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "MidiProcessor.h"
+#include "LowBox.h"
 
 int MidiEffectAudioProcessor::commasToPitchBend(String commas) {
     if (commas == "NaN")
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<int>::max();
 
-    int pitchWheelValue = commas.getIntValue() * 16384 / 9;
-    if (pitchWheelValue >= 0 || pitchWheelValue < 16384)
-       return commas.getIntValue();
-
-    DBG("INVALID PITCH DATA: " << commas);
+    int pitchWheelValue = commas.getIntValue() * 8192 / 9 + 8192;
+    if (pitchWheelValue >= 0 && pitchWheelValue < 16384)
+        return commas.getIntValue();
+    else
+    {
+        DBG("INVALID PITCH DATA: " << commas);
+        throw(std::range_error("Cannot convert commas to a valid pitch bend value"));
+        return 0;
+    }
 }
 
 //==============================================================================
@@ -124,7 +129,8 @@ void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
 
     for (int i = 0; i < 128; i++)
     {
-        alterations.add(0);
+        alterations.set(i, std::numeric_limits<int>::max());
+        //DBG("DBG nan: " << alterations[i]);
     }
 
     while (!inputStream.isExhausted())
@@ -132,7 +138,7 @@ void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
         auto line = inputStream.readNextLine();
 
         int noteNumber = line.upToFirstOccurrenceOf(",", false, true).getIntValue();
-        DBG(noteNumber);
+        //DBG(noteNumber);
 
         String altStr = line.fromFirstOccurrenceOf(",", false, true).upToFirstOccurrenceOf(",", false, true);
         alterations.set(noteNumber, commasToPitchBend(altStr));
@@ -149,8 +155,9 @@ void MidiEffectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::File defaultFile("D:/Documents/JUCE\ Projex/MidiEffect/Saba.csv");
-    readScale(defaultFile);
+
+    /*juce::File defaultFile("D:/Documents/JUCE\ Projex/MidiEffect/Saba.csv");
+    readScale(defaultFile);*/
 }
 
 void MidiEffectAudioProcessor::releaseResources()
