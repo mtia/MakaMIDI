@@ -82,9 +82,9 @@ public:
     };
 
     // change the content of the box
-    void setAlteration(String noteName, int newAlteration)
+    void setAlteration(int noteNum, int newAlteration)
     {
-        note->setText(noteName);
+        note->setSelectedId(noteNum-11);
 
         String * stringAlt = new String();
         if (newAlteration > 0)
@@ -105,7 +105,7 @@ public:
         std::vector<String> noteNames = {
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
         };
-        return noteNames[number % 12] + String(std::floor((number + 12) / 12));
+        return noteNames[number % 12] + String(std::floor((number-12)/ 12));
     }
 
 
@@ -140,7 +140,7 @@ private:
         };
 
         StringArray output;
-        for (int i = 0; i < 115; i++) {
+        for (int i = 0; i < 116; i++) {
             output.add(noteNames[i % 12] + String(std::floor(i / 12)));
         }
 

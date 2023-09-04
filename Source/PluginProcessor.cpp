@@ -29,7 +29,7 @@ int MidiEffectAudioProcessor::parseCommas(String commas) {
 void MidiEffectAudioProcessor::printAlterations()
 {
     for (int i = 70; i < 100; i++)
-        DBG("note " << i+12 << ": " << alterations[i]);
+        DBG("note " << i << ": " << alterations[i]);
 }
 
 //==============================================================================
@@ -162,6 +162,8 @@ void MidiEffectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    midiProcessor.exclusive = &exclusive;
 
     /*juce::File defaultFile("D:/Documents/JUCE\ Projex/MidiEffect/Saba.csv");
     readScale(defaultFile);*/

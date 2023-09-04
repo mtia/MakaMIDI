@@ -138,13 +138,14 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
     int boxnum = 0;
 
     // for each noteNumber
-    for (int i = 0; i < 128; i++)
+    for (int i = 23; i < 128; i++)
     {
         // if there is a record in the alterations
         if (p->alterations[i]!=std::numeric_limits<int>::max()) {
             //DBG("Alterations[" << String(i) << "]: " << String(p->alterations[i]));
             // fill a ComboBox with the corresponding couple note+alteration
-            lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);
+            //lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);
+            lowButtons[boxnum]->setAlteration(i, p->alterations[i]);
             boxnum++;
         }
         if (boxnum > 9)
@@ -174,7 +175,7 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
                 int alt = lowButtons[i]->alteration->getSelectedId() - 10;
                 audioProcessor.alterations.set(j, alt);
                 // ComboBox starts from C1 (#24)
-                DBG("updateAlterations - MIDInote: " << j-24 << " alt: " << alt);
+                DBG("updateAlterations - MIDInote: " << j << " alt: " << alt);
             }
         }
     }

@@ -107,20 +107,24 @@ public:
 
                 // get alteration for the current note
                 int noteNumber = currentMessage.getNoteNumber();
-                *pitchCorrection = getPitchCorrection(noteNumber, alterations);
 
-                if (*pitchCorrection != 0) {
+                // do nothing if playing an excluded note in exclusive mode
+                if (alterations[noteNumber] != std::numeric_limits<int>::max() || !exclusive)
+                {
+                    *pitchCorrection = getPitchCorrection(noteNumber, alterations);
 
-                    // create a pitch message summing the wheel alteration and the note alteration
-                    MidiMessage pitchMessage = MidiMessage::pitchWheel(currentChannel, clipPitch(*pitchWheelValue + *pitchCorrection));
-                    DBG("NOTE ON: Pitch wheel " << *pitchWheelValue << " +  correction " << *pitchCorrection);
-                    
-                    processedBuffer.addEvent(pitchMessage, samplePos);
+                    if (*pitchCorrection != 0) {
+
+                        // create a pitch message summing the wheel alteration and the note alteration
+                        MidiMessage pitchMessage = MidiMessage::pitchWheel(currentChannel, clipPitch(*pitchWheelValue + *pitchCorrection));
+                        DBG("NOTE ON: Pitch wheel " << *pitchWheelValue << " +  correction " << *pitchCorrection);
+
+                        processedBuffer.addEvent(pitchMessage, samplePos);
+                    }
+                    *activeNoteNumber = currentMessage.getNoteNumber();
+                    // forward noteOn
+                    processedBuffer.addEvent(currentMessage, samplePos);
                 }
-                *activeNoteNumber = currentMessage.getNoteNumber();
-
-                // forward noteOn
-                processedBuffer.addEvent(currentMessage, samplePos);
             }
 
             //  key release (note not suppressed by the monophonic function)
@@ -138,4 +142,5 @@ public:
     }
 
     MidiBuffer processedBuffer;
+    bool* exclusive;
 };
