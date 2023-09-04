@@ -13,7 +13,7 @@
 #include "LowBox.h"
 
 //==============================================================================
-struct Placeholder : juce::Component
+struct Placeholder : Component
 {
     Placeholder(); 
 
@@ -36,12 +36,12 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     void updateBoxes(MidiEffectAudioProcessor* p);
+    void updateAlterations();
 
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     MidiEffectAudioProcessor& audioProcessor;
-
 
     // GUI Components
     juce::TextButton loadBtn, exModeBtn;
@@ -52,7 +52,9 @@ private:
 
     juce::Component upperBox, lowerBox;
 
-    LowBox* lowButtons[10];
+    std::unique_ptr<LowBox> lowButtons[10];
+
+    juce::AudioProcessorValueTreeState::ButtonAttachment* buttonAttachments[10];
 
     //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessorEditor)

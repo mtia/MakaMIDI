@@ -56,9 +56,13 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     exModeBtn.setToggleState(false, false); // default off
 
     exModeBtn.onClick = [this] {
+        
         audioProcessor.exclusive = !audioProcessor.exclusive;
         exModeBtn.setToggleState(audioProcessor.exclusive, false);
         DBG("Exclusive: " << (audioProcessor.exclusive ? "true" : "false"));
+
+        audioProcessor.printAlterations();
+
     };
 
     addAndMakeVisible(lowerBox);
@@ -72,12 +76,16 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     addAndMakeVisible(loadBtn);
     addAndMakeVisible(exModeBtn);
     
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 10; i++)
     {
-        addAndMakeVisible(lowButtons[i] = new LowBox());
+        lowButtons[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
+        lowButtons[i]->note->onChange = [this] { updateAlterations(); };
+        lowButtons[i]->alteration->onChange = [this] { updateAlterations(); };
+        lowButtons[i]->toggle->onStateChange = [this] { updateAlterations(); };
+        addAndMakeVisible(*lowButtons[i]);
     }
 
-    setSize (700, 200);
+    setSize (900, 170);
 }
 
 MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
@@ -100,7 +108,7 @@ void MidiEffectAudioProcessorEditor::resized()
     int N = 10; // number of components in the lower area
     auto bounds = getLocalBounds();
     
-    upperBox.setBounds(bounds.removeFromTop(100));
+    upperBox.setBounds(bounds.removeFromTop(70));
     lowerBox.setBounds(bounds);
     auto lowBounds = lowerBox.getBounds();
     auto boxWidth = lowerBox.getWidth()/(N+1);
@@ -141,5 +149,33 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
         }
         if (boxnum > 9)
             break;
+    }
+}
+
+void MidiEffectAudioProcessorEditor::updateAlterations()
+{
+
+    for (int i = 0; i < 128; i++)
+    {
+        audioProcessor.alterations.set(i, std::numeric_limits<int>::max());
+    }
+
+    // for each control box
+    for (int i = 0; i < 10; i++)
+    {
+        // if the toggle is active
+        if (lowButtons[i]->toggle->getToggleState())
+        {
+            // if the combobox are not in default position
+            if (lowButtons[i]->note->getSelectedId() && lowButtons[i]->alteration->getSelectedId())
+            {
+                // C0 = MIDI note #12, alterations starts from 0
+                int j = lowButtons[i]->note->getSelectedId()+11;
+                int alt = lowButtons[i]->alteration->getSelectedId() - 10;
+                audioProcessor.alterations.set(j, alt);
+                // ComboBox starts from C1 (#24)
+                DBG("updateAlterations - MIDInote: " << j-24 << " alt: " << alt);
+            }
+        }
     }
 }

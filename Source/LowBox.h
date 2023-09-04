@@ -15,7 +15,11 @@ class LowBox : public juce::Component
 {
 public:
 
-    LowBox()
+    juce::ComboBox* note;
+    juce::ToggleButton* toggle;
+    juce::ComboBox* alteration;
+
+    LowBox(juce::AudioProcessorValueTreeState &apvts, int i)
     {
 
         note = new ComboBox();
@@ -28,12 +32,24 @@ public:
         note->setEnabled(false);
         alteration->setEnabled(false);
 
-        note->addItemList(midiNotes,1);
+        note->addItemList(midiNotes, 1);
         alteration->addItemList(alterationsInCommas,1);
 
         toggle->setClickingTogglesState(true);
         toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
-        toggle->onClick = [this] { toggleClicked(); };
+
+        toggle->onClick = [this] () { toggleClicked(); };
+
+        String ts = String("Toggle ");
+        ts.append(String(i), 2);
+        String ns = String("Note ");
+        ns.append(String(i), 2);
+        String as = String("Alteration ");
+        as.append(String(i), 2);
+
+        toggleAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(apvts, ts, *toggle);
+        noteAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts, ns, *note);
+        alterationAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts, as, *alteration);
         
         addAndMakeVisible(note);
         addAndMakeVisible(alteration);
@@ -51,7 +67,7 @@ public:
         toggle->setBounds(bounds);
     };
 
-    void toggleClicked() 
+    void toggleClicked()
     {
         if (toggle->getToggleState())
         {
@@ -92,13 +108,30 @@ public:
         return noteNames[number % 12] + String(std::floor((number + 12) / 12));
     }
 
+
 private:
-    juce::ComboBox* note;
-    juce::ComboBox* alteration;
-    juce::ToggleButton* toggle;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> noteAttachment;
+    std::unique_ptr < juce::AudioProcessorValueTreeState::ComboBoxAttachment> alterationAttachment; 
+    std::unique_ptr < juce::AudioProcessorValueTreeState::ButtonAttachment> toggleAttachment;
+
+    int index;
 
     const juce::StringArray midiNotes = listMIDINotes();
     const juce::StringArray alterationsInCommas = listAlterationsInCommas();
+
+    juce::StringArray listAlterationsInCommas()
+    {
+        StringArray output;
+        for (int i = -9; i < 10; i++)
+        {
+            String* s = new String();
+            if (i > 0)
+                s->append("+", 1);
+            s->append(String(i), 2);
+            output.add(*s);
+        }
+        return output;
+    }
 
     juce::StringArray listMIDINotes()
     {
@@ -108,23 +141,9 @@ private:
 
         StringArray output;
         for (int i = 0; i < 115; i++) {
-            output.add(noteNames[i % 12] + String(std::floor((i + 12) / 12)));
+            output.add(noteNames[i % 12] + String(std::floor(i / 12)));
         }
 
-        return output;
-    }
-
-    juce::StringArray listAlterationsInCommas()
-    {
-        StringArray output;
-        for (int i = -9; i < 10; i++)
-        {
-            String * s = new String();
-            if (i > 0)
-                s->append("+",1);
-            s->append(String(i),2);
-            output.add(*s);
-        }
         return output;
     }
 

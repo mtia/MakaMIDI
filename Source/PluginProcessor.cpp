@@ -11,12 +11,12 @@
 #include "MidiProcessor.h"
 #include "LowBox.h"
 
-int MidiEffectAudioProcessor::commasToPitchBend(String commas) {
+int MidiEffectAudioProcessor::parseCommas(String commas) {
     if (commas == "NaN")
         return std::numeric_limits<int>::max();
 
-    int pitchWheelValue = commas.getIntValue() * 8192 / 9 + 8192;
-    if (pitchWheelValue >= 0 && pitchWheelValue < 16384)
+    int numCommas = commas.getIntValue();
+    if (numCommas > -10 && numCommas < 10)
         return commas.getIntValue();
     else
     {
@@ -24,6 +24,12 @@ int MidiEffectAudioProcessor::commasToPitchBend(String commas) {
         throw(std::range_error("Cannot convert commas to a valid pitch bend value"));
         return 0;
     }
+}
+
+void MidiEffectAudioProcessor::printAlterations()
+{
+    for (int i = 70; i < 100; i++)
+        DBG("note " << i+12 << ": " << alterations[i]);
 }
 
 //==============================================================================
@@ -141,7 +147,8 @@ void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
         //DBG(noteNumber);
 
         String altStr = line.fromFirstOccurrenceOf(",", false, true).upToFirstOccurrenceOf(",", false, true);
-        alterations.set(noteNumber, commasToPitchBend(altStr));
+        // alterations.set(noteNumber, commasToPitchBend(altStr));
+        alterations.set(noteNumber, parseCommas(altStr));
     }
 
     /*for (int i = 0; i < 128; i++)
@@ -221,6 +228,55 @@ void MidiEffectAudioProcessor::setStateInformation (const void* data, int sizeIn
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+
+juce::StringArray listAlterationsInCommas()
+{
+    StringArray output;
+    for (int i = -9; i < 10; i++)
+    {
+        String* s = new String();
+        if (i > 0)
+            s->append("+", 1);
+        s->append(String(i), 2);
+        output.add(*s);
+    }
+    return output;
+}
+
+juce::StringArray listMIDINotes()
+{
+    std::vector<String> noteNames = {
+        "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
+    };
+
+    StringArray output;
+    for (int i = 0; i < 115; i++) {
+        output.add(noteNames[i % 12] + String(std::floor((i + 12) / 12)));
+    }
+
+    return output;
+}
+
+AudioProcessorValueTreeState::ParameterLayout MidiEffectAudioProcessor::createParameterLayout()
+{
+    AudioProcessorValueTreeState::ParameterLayout layout;
+
+    for (int i = 1; i <= 10; ++i)
+    {
+        String ts = String("Toggle ");
+        ts.append(String(i), 2);
+        String ns = String("Note ");
+        ns.append(String(i), 2);
+        String as = String("Alteration ");
+        as.append(String(i), 2);
+        layout.add(std::make_unique<AudioParameterBool>(ts, ts, false));
+        layout.add(std::make_unique<AudioParameterChoice>(ns, ns, listMIDINotes(), 0));
+        layout.add(std::make_unique<AudioParameterChoice>(as, as, listAlterationsInCommas(), 0));
+    }
+
+    return layout;
 }
 
 //==============================================================================

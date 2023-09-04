@@ -27,6 +27,7 @@ public:
 
     //==============================================================================
     void readScale(const juce::File& fileToRead);
+    void printAlterations();
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -59,8 +60,11 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    int commasToPitchBend(String commas);
-    //juce::AudioProcessorValueTreeState apvts;
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
+
+    int parseCommas(String commas);
+    
     juce::File root, savedFile;
     int pitchWheelValue = 8192;
     int pitchCorrection = 0;
