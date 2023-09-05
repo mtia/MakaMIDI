@@ -83,7 +83,8 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         addAndMakeVisible(*lowButtons[i]);
     }
 
-    bgImg = ImageCache::getFromFile(File("D:/Documents/JUCE\ Projex/MidiEffect/Oud.png"));
+    bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
+    DBG(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getFullPathName());
     setSize (900, 200);
 }
 
