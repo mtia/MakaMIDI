@@ -14,6 +14,9 @@ Insert the plugin into a MIDI track of a DAW. Activate the alterations menù thr
   <img src="commas.gif" width="350">
 </p>
 
+The model shown in the picture above represents the partition of a whole tone in 9 equal commas to handle microtonal pitch variations.
+See https://en.wikipedia.org/wiki/Turkish_makam
+
 ### Load scale
 
 Load a preset of alterations from a csv file. See sample files Rast.csv and Saba.csv from this folder. The new alterations will overwrite the previously selected ones.
