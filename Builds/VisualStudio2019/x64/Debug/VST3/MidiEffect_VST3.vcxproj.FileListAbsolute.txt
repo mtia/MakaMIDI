@@ -1,0 +1,2 @@
+D:\Documents\JUCE Projex\MidiEffect\Builds\VisualStudio2019\x64\Debug\VST3\MidiEffect.dll
+D:\Documents\JUCE Projex\MidiEffect\Builds\VisualStudio2019\x64\Debug\VST3\MidiEffect.pdb
