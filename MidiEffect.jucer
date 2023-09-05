@@ -5,12 +5,11 @@
               pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn">
   <MAINGROUP id="pzLAxW" name="MidiEffect">
     <GROUP id="{818FEFCD-2121-428E-DB0B-196769C0D3E8}" name="Source">
-      <FILE id="oi6xDq" name="NoteAlteration.h" compile="0" resource="0"
-            file="Source/NoteAlteration.h"/>
       <FILE id="dOvIYU" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="wRzyL8" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
+      <FILE id="a4MpTv" name="LowBox.h" compile="0" resource="0" file="Source/LowBox.h"/>
       <FILE id="VRf85K" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
       <FILE id="GW6zC1" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
