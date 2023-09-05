@@ -56,6 +56,9 @@ private:
 
     juce::AudioProcessorValueTreeState::ButtonAttachment* buttonAttachments[10];
 
+    // BG Image
+    Image bgImg;
+
     //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessorEditor)
 };

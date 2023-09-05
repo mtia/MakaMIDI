@@ -151,22 +151,11 @@ void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
         alterations.set(noteNumber, parseCommas(altStr));
     }
 
-    /*for (int i = 0; i < 128; i++)
-    {
-        DBG("Note number: " << i << " \talteration " << alterations[i]);
-    }*/
-
 }
 
 void MidiEffectAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-
     midiProcessor.exclusive = &exclusive;
-
-    /*juce::File defaultFile("D:/Documents/JUCE\ Projex/MidiEffect/Saba.csv");
-    readScale(defaultFile);*/
 }
 
 void MidiEffectAudioProcessor::releaseResources()

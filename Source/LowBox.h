@@ -15,30 +15,32 @@ class LowBox : public juce::Component
 {
 public:
 
-    juce::ComboBox* note;
-    juce::ToggleButton* toggle;
-    juce::ComboBox* alteration;
+    std::unique_ptr<juce::ComboBox> note;
+    std::unique_ptr<juce::ToggleButton> toggle;
+    std::unique_ptr<juce::ComboBox> alteration;
 
     LowBox(juce::AudioProcessorValueTreeState &apvts, int i)
     {
 
-        note = new ComboBox();
-        alteration = new ComboBox();
-        toggle = new ToggleButton();
+        note = std::make_unique<ComboBox>();
+        alteration = std::make_unique<ComboBox>();
+        toggle = std::make_unique<ToggleButton>();
 
         /*DBG(midiNotes.joinIntoString(","));
         DBG(alterationsInCommas.joinIntoString(","));*/
 
         note->setEnabled(false);
         alteration->setEnabled(false);
-
         note->addItemList(midiNotes, 1);
         alteration->addItemList(alterationsInCommas,1);
+        // note->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        // alteration->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        note->setTextWhenNothingSelected("");
+        alteration->setTextWhenNothingSelected("");
 
         toggle->setClickingTogglesState(true);
-        toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
-
         toggle->onClick = [this] () { toggleClicked(); };
+        toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
 
         String ts = String("Toggle ");
         ts.append(String(i), 2);
@@ -51,9 +53,9 @@ public:
         noteAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts, ns, *note);
         alterationAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts, as, *alteration);
         
-        addAndMakeVisible(note);
-        addAndMakeVisible(alteration);
-        addAndMakeVisible(toggle);
+        addAndMakeVisible(*note);
+        addAndMakeVisible(*alteration);
+        addAndMakeVisible(*toggle);
     };
 
     void resized() override
@@ -91,6 +93,9 @@ public:
             stringAlt->append("+", 1);
         stringAlt->append(String(newAlteration), 2);
         alteration->setText(*stringAlt);
+        toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
+        note->setEnabled(true);
+        alteration->setEnabled(true);
     }
 
     static std::vector<String> getNoteNames()
@@ -106,6 +111,15 @@ public:
             "C", "C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"
         };
         return noteNames[number % 12] + String(std::floor((number-12)/ 12));
+    }
+
+    void reset()
+    {
+        note->setEnabled(false);
+        note->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        alteration->setEnabled(false);
+        alteration->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
     }
 
 

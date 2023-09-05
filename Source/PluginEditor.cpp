@@ -55,14 +55,12 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     exModeBtn.setColour(juce::TextButton::buttonOnColourId, juce::Colours::darkred);
     exModeBtn.setToggleState(false, false); // default off
 
+    loadBtn.setColour(juce::TextButton::buttonColourId, juce::Colours::black);
+    loadBtn.setColour(juce::TextButton::textColourOffId, juce::Colours::darkgoldenrod);
+
     exModeBtn.onClick = [this] {
-        
         audioProcessor.exclusive = !audioProcessor.exclusive;
         exModeBtn.setToggleState(audioProcessor.exclusive, false);
-        DBG("Exclusive: " << (audioProcessor.exclusive ? "true" : "false"));
-
-        audioProcessor.printAlterations();
-
     };
 
     addAndMakeVisible(lowerBox);
@@ -85,22 +83,20 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         addAndMakeVisible(*lowButtons[i]);
     }
 
-    setSize (900, 170);
+    bgImg = ImageCache::getFromFile(File("D:/Documents/JUCE\ Projex/MidiEffect/Oud.png"));
+    setSize (900, 200);
 }
 
 MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
 {
+    setLookAndFeel(nullptr);
 }
 
 //==============================================================================
 void MidiEffectAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    /*g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);*/
+    g.fillAll(juce::Colours::black);
+    g.drawImage(bgImg, upperBox.getLocalBounds().toFloat());
 }
 
 void MidiEffectAudioProcessorEditor::resized()
@@ -108,7 +104,7 @@ void MidiEffectAudioProcessorEditor::resized()
     int N = 10; // number of components in the lower area
     auto bounds = getLocalBounds();
     
-    upperBox.setBounds(bounds.removeFromTop(70));
+    upperBox.setBounds(bounds.removeFromTop(100));
     lowerBox.setBounds(bounds);
     auto lowBounds = lowerBox.getBounds();
     auto boxWidth = lowerBox.getWidth()/(N+1);
@@ -138,7 +134,7 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
     int boxnum = 0;
 
     // for each noteNumber
-    for (int i = 23; i < 128; i++)
+    for (int i = 0; i < 128; i++)
     {
         // if there is a record in the alterations
         if (p->alterations[i]!=std::numeric_limits<int>::max()) {
@@ -148,9 +144,15 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
             lowButtons[boxnum]->setAlteration(i, p->alterations[i]);
             boxnum++;
         }
+
+        // if more than 9 alterations are loaded, don't show the remaining ones
         if (boxnum > 9)
             break;
     }
+
+    // reset unused boxes
+    for (int i = boxnum; i <= 9; i++)
+        lowButtons[i]->reset();
 }
 
 void MidiEffectAudioProcessorEditor::updateAlterations()
