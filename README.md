@@ -18,8 +18,9 @@ Insert the plugin into a MIDI track of a DAW. Activate the alterations menù thr
 
 Load a preset of alterations from a csv file. See sample files Rast.csv and Saba.csv from this folder. The new alterations will overwrite the previously selected ones.
 If more than 10 alterations are present, they won't be shown in the ComboBoxes but they will be effective.
-Alteration = 0     --> note present in the scale unaltered
-Alteration = NaN   --> note not in scale (see Exclusive mode)
+\
+Alteration = 0 &nbsp; &nbsp; &nbsp; --> note present in the scale unaltered \
+Alteration = NaN &nbsp;--> note not in scale (see Exclusive mode)
 
 ### Exclusive mode
 
