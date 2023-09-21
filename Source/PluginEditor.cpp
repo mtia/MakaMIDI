@@ -139,6 +139,7 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
     {
         // if there is a record in the alterations
         if (p->alterations[i]!=std::numeric_limits<int>::max()) {
+            DBG("Loading alteration: " + String(p->alterations[i]));
             //DBG("Alterations[" << String(i) << "]: " << String(p->alterations[i]));
             // fill a ComboBox with the corresponding couple note+alteration
             //lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);

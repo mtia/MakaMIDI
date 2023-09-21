@@ -12,7 +12,7 @@
 #include "LowBox.h"
 
 int MidiEffectAudioProcessor::parseCommas(String commas) {
-    if (commas == "NaN")
+    if (commas.indexOf("N")>=0)
         return std::numeric_limits<int>::max();
 
     int numCommas = commas.getIntValue();
@@ -144,10 +144,10 @@ void MidiEffectAudioProcessor::readScale(const juce::File& fileToRead)
         auto line = inputStream.readNextLine();
 
         int noteNumber = line.upToFirstOccurrenceOf(",", false, true).getIntValue();
-        //DBG(noteNumber);
 
         String altStr = line.fromFirstOccurrenceOf(",", false, true).upToFirstOccurrenceOf(",", false, true);
-        // alterations.set(noteNumber, commasToPitchBend(altStr));
+        
+        DBG(altStr + " -> " + String(parseCommas(altStr)));
         alterations.set(noteNumber, parseCommas(altStr));
     }
 
