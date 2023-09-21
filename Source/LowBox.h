@@ -33,8 +33,8 @@ public:
         alteration->setEnabled(false);
         note->addItemList(midiNotes, 1);
         alteration->addItemList(alterationsInCommas,1);
-        // note->setSelectedId(-1, juce::NotificationType::dontSendNotification);
-        // alteration->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        note->setSelectedId(0, juce::NotificationType::dontSendNotification);
+        alteration->setSelectedId(0, juce::NotificationType::dontSendNotification);
         note->setTextWhenNothingSelected("");
         alteration->setTextWhenNothingSelected("");
 
@@ -86,7 +86,7 @@ public:
     // change the content of the box
     void setAlteration(int noteNum, int newAlteration)
     {
-        note->setSelectedId(noteNum-11);
+        note->setSelectedId(noteNum-10);
 
         String * stringAlt = new String();
         if (newAlteration > 0)
@@ -116,9 +116,9 @@ public:
     void reset()
     {
         note->setEnabled(false);
-        note->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        note->setSelectedId(0, juce::NotificationType::dontSendNotification);
         alteration->setEnabled(false);
-        alteration->setSelectedId(-1, juce::NotificationType::dontSendNotification);
+        alteration->setSelectedId(0, juce::NotificationType::dontSendNotification);
         toggle->setToggleState(false, juce::NotificationType::dontSendNotification);
     }
 
@@ -136,6 +136,7 @@ private:
     juce::StringArray listAlterationsInCommas()
     {
         StringArray output;
+        output.add("");
         for (int i = -9; i < 10; i++)
         {
             String* s = new String();
@@ -154,6 +155,7 @@ private:
         };
 
         StringArray output;
+        output.add("");
         for (int i = 0; i < 116; i++) {
             output.add(noteNames[i % 12] + String(std::floor(i / 12)));
         }

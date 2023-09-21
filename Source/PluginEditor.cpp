@@ -172,11 +172,11 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
         if (lowButtons[i]->toggle->getToggleState())
         {
             // if the combobox are not in default position
-            if (lowButtons[i]->note->getSelectedId() && lowButtons[i]->alteration->getSelectedId())
+            if (lowButtons[i]->note->getSelectedId()>1 && lowButtons[i]->alteration->getSelectedId()>1)
             {
                 // C0 = MIDI note #12, alterations starts from 0
-                int j = lowButtons[i]->note->getSelectedId()+11;
-                int alt = lowButtons[i]->alteration->getSelectedId() - 10;
+                int j = lowButtons[i]->note->getSelectedId()+10;
+                int alt = lowButtons[i]->alteration->getSelectedId() - 11;
                 audioProcessor.alterations.set(j, alt);
                 // ComboBox starts from C1 (#24)
                 DBG("updateAlterations - MIDInote: " << j << " alt: " << alt);
