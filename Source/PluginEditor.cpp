@@ -63,18 +63,21 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         exModeBtn.setToggleState(audioProcessor.exclusive, false);
     };
 
-    addAndMakeVisible(lowerBox);
-    addAndMakeVisible(noteLabel);
-    addAndMakeVisible(alterationLabel);
-    noteLabel.setText("Note: ", juce::NotificationType::dontSendNotification);
-    alterationLabel.setText("Alteration (commas): ", juce::NotificationType::dontSendNotification);
-
+    addAndMakeVisible(firstButtonRow);
+    addAndMakeVisible(noteLabel1);
+    addAndMakeVisible(alterationLabel1);
+    addAndMakeVisible(noteLabel2);
+    addAndMakeVisible(alterationLabel2);
+    noteLabel1.setText("Note: ", juce::NotificationType::dontSendNotification);
+    alterationLabel1.setText("Alteration (commas): ", juce::NotificationType::dontSendNotification);
+    noteLabel2.setText("Note: ", juce::NotificationType::dontSendNotification);
+    alterationLabel2.setText("Alteration (commas): ", juce::NotificationType::dontSendNotification);
 
     addAndMakeVisible(upperBox);
     addAndMakeVisible(loadBtn);
     addAndMakeVisible(exModeBtn);
     
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 16; i++)
     {
         lowButtons[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
         lowButtons[i]->note->onChange = [this] { updateAlterations(); };
@@ -85,7 +88,7 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
 
     bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
     DBG(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getFullPathName());
-    setSize (900, 200);
+    setSize (800, 300);
 }
 
 MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
@@ -102,18 +105,27 @@ void MidiEffectAudioProcessorEditor::paint (juce::Graphics& g)
 
 void MidiEffectAudioProcessorEditor::resized()
 {
-    int N = 10; // number of components in the lower area
+    int N = 16; // number of components in the lower area
     auto bounds = getLocalBounds();
     
     upperBox.setBounds(bounds.removeFromTop(100));
-    lowerBox.setBounds(bounds);
-    auto lowBounds = lowerBox.getBounds();
-    auto boxWidth = lowerBox.getWidth()/(N+1);
-    auto boxHeight = lowerBox.getHeight() / 2.5;
-    auto leftPanel = lowBounds.removeFromLeft(boxWidth);
-    noteLabel.setBounds(leftPanel.removeFromTop(boxHeight));
-    alterationLabel.setBounds(leftPanel.removeFromTop(boxHeight));
+    firstButtonRow.setBounds(bounds.removeFromTop(100));
+    secondButtonRow.setBounds(bounds);
+
+    auto firstButtonRowBounds = firstButtonRow.getBounds();
+    auto secondButtonRowBounds = secondButtonRow.getBounds();
+
+    auto boxWidth = firstButtonRow.getWidth()/(N/2+1);
+    auto boxHeight = firstButtonRow.getHeight() / 2.5;
+
+    auto leftPanel1 = firstButtonRowBounds.removeFromLeft(boxWidth);
+    auto leftPanel2 = secondButtonRowBounds.removeFromLeft(boxWidth);
     
+    noteLabel1.setBounds(leftPanel1.removeFromTop(boxHeight));
+    alterationLabel1.setBounds(leftPanel1.removeFromTop(boxHeight));
+    noteLabel2.setBounds(leftPanel2.removeFromTop(boxHeight));
+    alterationLabel2.setBounds(leftPanel2.removeFromTop(boxHeight));
+
     const auto btnX = getWidth() * (0.035);
     const auto btnY = getHeight() * (0.09);
     const auto btnWidth = getWidth() * (0.12);
@@ -122,8 +134,12 @@ void MidiEffectAudioProcessorEditor::resized()
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
     exModeBtn.setBounds(getWidth()*(1-0.035) - btnWidth, btnY, btnWidth, btnHeight);
 
-    for (int i = 0; i < N; i++) {
-        lowButtons[i]->setBounds(lowBounds.removeFromLeft(boxWidth));
+    for (int i = 0; i < N/2; i++) {
+        lowButtons[i]->setBounds(firstButtonRowBounds.removeFromLeft(boxWidth));
+    }
+
+    for (int i = N/2; i < N; i++) {
+        lowButtons[i]->setBounds(secondButtonRowBounds.removeFromLeft(boxWidth));
     }
 
 }
@@ -131,7 +147,7 @@ void MidiEffectAudioProcessorEditor::resized()
 // once a scale file has been read, this function updates the ComboBoxes on the GUI
 void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
 {
-    // boxnum counts how many notes the scale is using, a maximum of 10 is shown
+    // boxnum counts how many notes the scale is using, a maximum of 16 is shown
     int boxnum = 0;
 
     // for each noteNumber
@@ -147,13 +163,13 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
             boxnum++;
         }
 
-        // if more than 9 alterations are loaded, don't show the remaining ones
-        if (boxnum > 9)
+        // if more than 15 alterations are loaded, don't show the remaining ones
+        if (boxnum > 15)
             break;
     }
 
     // reset unused boxes
-    for (int i = boxnum; i <= 9; i++)
+    for (int i = boxnum; i <= 15; i++)
         lowButtons[i]->reset();
 }
 
@@ -166,7 +182,7 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
     }
 
     // for each control box
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 15; i++)
     {
         // if the toggle is active
         if (lowButtons[i]->toggle->getToggleState())

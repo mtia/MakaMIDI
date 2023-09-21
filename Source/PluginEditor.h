@@ -48,13 +48,13 @@ private:
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    juce::Label noteLabel, alterationLabel;
+    juce::Label noteLabel1, alterationLabel1, noteLabel2, alterationLabel2;
 
-    juce::Component upperBox, lowerBox;
+    juce::Component upperBox, firstButtonRow, secondButtonRow;
 
-    std::unique_ptr<LowBox> lowButtons[10];
+    std::unique_ptr<LowBox> lowButtons[16];
 
-    juce::AudioProcessorValueTreeState::ButtonAttachment* buttonAttachments[10];
+    juce::AudioProcessorValueTreeState::ButtonAttachment* buttonAttachments[16];
 
     // BG Image
     Image bgImg;
