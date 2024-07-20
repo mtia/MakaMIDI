@@ -109,7 +109,7 @@ public:
                 int noteNumber = currentMessage.getNoteNumber();
 
                 // do nothing if playing an excluded note in exclusive mode
-                if (alterations[noteNumber] != std::numeric_limits<int>::max() || !exclusive)
+                if (alterations[noteNumber] != std::numeric_limits<int>::max() || !*exclusive)
                 {
                     *pitchCorrection = getPitchCorrection(noteNumber, alterations);
 
@@ -124,6 +124,18 @@ public:
                     *activeNoteNumber = currentMessage.getNoteNumber();
                     // forward noteOn
                     processedBuffer.addEvent(currentMessage, samplePos);
+                }
+                else
+                {
+                    if(*exclusive)
+                    {
+                        DBG("Skipped note: " << noteNumber << " exclusive mode ON");
+                    }
+                    else
+                    {
+                        DBG("Skipped note: " << noteNumber << " exclusive mode OFF");
+                        DBG("With Alteration: " << alterations[noteNumber]);
+                    }
                 }
             }
 

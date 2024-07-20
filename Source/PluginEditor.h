@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "LowBox.h"
+#include "BinaryData.h"
 
 //==============================================================================
 struct Placeholder : Component

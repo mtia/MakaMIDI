@@ -21,9 +21,11 @@
 MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     loadBtn.setButtonText("Load scale");
+
     loadBtn.onClick = [this](){
         fileChooser = std::make_unique<juce::FileChooser>("Choose a file",
             audioProcessor.root,
@@ -61,6 +63,8 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     exModeBtn.onClick = [this] {
         audioProcessor.exclusive = !audioProcessor.exclusive;
         exModeBtn.setToggleState(audioProcessor.exclusive, false);
+        String s = audioProcessor.exclusive ? "ON" : "OFF";
+        DBG("Exclusive mode: " << s);
     };
 
     addAndMakeVisible(firstButtonRow);
@@ -85,9 +89,10 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         lowButtons[i]->toggle->onStateChange = [this] { updateAlterations(); };
         addAndMakeVisible(*lowButtons[i]);
     }
-
-    bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
+    bgImg = ImageFileFormat::loadFrom(BinaryData::Oud_png, BinaryData::Oud_pngSize);
+    // bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
     DBG(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getFullPathName());
+    DBG(File::getCurrentWorkingDirectory().getFullPathName());
     setSize (800, 300);
 }
 
