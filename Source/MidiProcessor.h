@@ -17,11 +17,12 @@ using namespace juce;
 class MidiProcessor
 {
 public:
-    void process(MidiBuffer& midiMessages, int *pitchWheelValue, int *pitchCorrection, const juce::Array<int> &alterations, int *activeNoteNumber)
+    int process(MidiBuffer& midiMessages, int *pitchWheelValue, int *pitchCorrection, const juce::Array<int> &alterations, int *activeNoteNumber)
     {
         processedBuffer.clear();
         processMidiInput(midiMessages, pitchWheelValue, pitchCorrection, alterations, activeNoteNumber);
         midiMessages.swapWith(processedBuffer);
+        return *pitchCorrection;
     }
 
     int getPitchCorrection(int noteNumber, const juce::Array<int> &alterations)
@@ -69,6 +70,8 @@ public:
 
         while (it.getNextEvent(currentMessage, samplePos))
         {
+            
+            // DBG("MSG # " << samplePos);
 
             // safety check
             if (!isValidPitchValue(*pitchWheelValue))
@@ -84,9 +87,8 @@ public:
             {
                 // store user's pitch alteration
                 *pitchWheelValue = currentMessage.getPitchWheelValue();
-                currentMessage.pitchWheel(currentChannel, clipPitch(*pitchWheelValue + *pitchCorrection));
-                DBG("Pitch wheel " << *pitchWheelValue << " +  correction " << *pitchCorrection);
-
+                currentMessage = MidiMessage::pitchWheel(currentChannel, clipPitch(*pitchWheelValue + *pitchCorrection));
+                
                 // forward modified pitchwheel message
                 processedBuffer.addEvent(currentMessage, samplePos);
             }
@@ -95,12 +97,11 @@ public:
             else if (currentMessage.isNoteOn())
             {
                 // stops all playing notes (MONOPHONIC FUNCTION)
-                /*MidiMessage cleanMessage = MidiMessage::allNotesOff(currentChannel);
-                processedBuffer.addEvent(cleanMessage, samplePos); // allNotesOff not guaratee to work*/
                 if (*activeNoteNumber != -1)
                 {
-                    // suppress active note
+                    // reset pitch value for the suppressing note
                     suppressNote(currentChannel, *activeNoteNumber, samplePos, pitchCorrection, pitchWheelValue, alterations);
+                    // generate NoteOff message to suppress note
                     MidiMessage cleanMessage = MidiMessage::noteOff(currentChannel, *activeNoteNumber, 0.0f);
                     processedBuffer.addEvent(cleanMessage, samplePos);
                 }
@@ -108,7 +109,7 @@ public:
                 // get alteration for the current note
                 int noteNumber = currentMessage.getNoteNumber();
 
-                // do nothing if playing an excluded note in exclusive mode
+                // do nothing if playing an excluded note in exclusive mode (+inf means excluded note)
                 if (alterations[noteNumber] != std::numeric_limits<int>::max() || !*exclusive)
                 {
                     *pitchCorrection = getPitchCorrection(noteNumber, alterations);

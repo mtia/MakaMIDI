@@ -49,17 +49,19 @@ private:
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
+    // labels on left side indicating rows of notes and alterations (2x2=4 rows)
     juce::Label noteLabel1, alterationLabel1, noteLabel2, alterationLabel2;
 
-    juce::Component upperBox, firstButtonRow, secondButtonRow;
+    // Upper Box contains image and two buttons, the two rows below contain the note controls
+    juce::Component upperBox, firstControlRow, secondControlRow;
 
-    std::unique_ptr<LowBox> lowButtons[16];
+    // 16 control box (note and relative alteration)
+    std::unique_ptr<LowBox> lowControls[16];
 
+    // attachments for the 16 controls
     juce::AudioProcessorValueTreeState::ButtonAttachment* buttonAttachments[16];
 
-    // BG Image
     Image bgImg;
 
-    //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessorEditor)
 };

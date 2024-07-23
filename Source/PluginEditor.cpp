@@ -1,20 +1,6 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
-*/
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-//#include "LowBox.h"
-
-/*Placeholder::Placeholder()
-{
-    juce::Random r;
-    customColor = juce::Colour(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-}*/
 
 
 //==============================================================================
@@ -22,8 +8,7 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
 
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    // setup "Load" button
     loadBtn.setButtonText("Load scale");
 
     loadBtn.onClick = [this](){
@@ -43,12 +28,15 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
                 audioProcessor.readScale(chosenFile);
                 
                 updateBoxes(&audioProcessor);
-
+            }
+            else{
+                // XXX#1
             }
         });
 
     };
 
+    // setup "Exclusive mode" button
     exModeBtn.setButtonText("Exclusive");
     exModeBtn.setToggleable(true);
     exModeBtn.setColour(juce::TextButton::textColourOnId, juce::Colours::white);
@@ -67,7 +55,8 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         DBG("Exclusive mode: " << s);
     };
 
-    addAndMakeVisible(firstButtonRow);
+
+    addAndMakeVisible(firstControlRow);
     addAndMakeVisible(noteLabel1);
     addAndMakeVisible(alterationLabel1);
     addAndMakeVisible(noteLabel2);
@@ -83,11 +72,12 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     
     for (int i = 0; i < 16; i++)
     {
-        lowButtons[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
-        lowButtons[i]->note->onChange = [this] { updateAlterations(); };
-        lowButtons[i]->alteration->onChange = [this] { updateAlterations(); };
-        lowButtons[i]->toggle->onStateChange = [this] { updateAlterations(); };
-        addAndMakeVisible(*lowButtons[i]);
+        // XXX#3
+        lowControls[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
+        lowControls[i]->note->onChange = [this] { updateAlterations(); };
+        lowControls[i]->alteration->onChange = [this] { updateAlterations(); };
+        lowControls[i]->toggle->onStateChange = [this] { updateAlterations(); };
+        addAndMakeVisible(*lowControls[i]);
     }
     bgImg = ImageFileFormat::loadFrom(BinaryData::Oud_png, BinaryData::Oud_pngSize);
     // bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
@@ -104,7 +94,9 @@ MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
 //==============================================================================
 void MidiEffectAudioProcessorEditor::paint (juce::Graphics& g)
 {
+    // make whole background black
     g.fillAll(juce::Colours::black);
+    // draw image in upper box
     g.drawImage(bgImg, upperBox.getLocalBounds().toFloat());
 }
 
@@ -114,17 +106,17 @@ void MidiEffectAudioProcessorEditor::resized()
     auto bounds = getLocalBounds();
     
     upperBox.setBounds(bounds.removeFromTop(100));
-    firstButtonRow.setBounds(bounds.removeFromTop(100));
-    secondButtonRow.setBounds(bounds);
+    firstControlRow.setBounds(bounds.removeFromTop(100));
+    secondControlRow.setBounds(bounds);
 
-    auto firstButtonRowBounds = firstButtonRow.getBounds();
-    auto secondButtonRowBounds = secondButtonRow.getBounds();
+    auto firstControlRowBounds = firstControlRow.getBounds();
+    auto secondControlRowBounds = secondControlRow.getBounds();
 
-    auto boxWidth = firstButtonRow.getWidth()/(N/2+1);
-    auto boxHeight = firstButtonRow.getHeight() / 2.5;
+    auto boxWidth = firstControlRow.getWidth()/(N/2+1);
+    auto boxHeight = firstControlRow.getHeight() / 2.5;
 
-    auto leftPanel1 = firstButtonRowBounds.removeFromLeft(boxWidth);
-    auto leftPanel2 = secondButtonRowBounds.removeFromLeft(boxWidth);
+    auto leftPanel1 = firstControlRowBounds.removeFromLeft(boxWidth);
+    auto leftPanel2 = secondControlRowBounds.removeFromLeft(boxWidth);
     
     noteLabel1.setBounds(leftPanel1.removeFromTop(boxHeight));
     alterationLabel1.setBounds(leftPanel1.removeFromTop(boxHeight));
@@ -140,11 +132,11 @@ void MidiEffectAudioProcessorEditor::resized()
     exModeBtn.setBounds(getWidth()*(1-0.035) - btnWidth, btnY, btnWidth, btnHeight);
 
     for (int i = 0; i < N/2; i++) {
-        lowButtons[i]->setBounds(firstButtonRowBounds.removeFromLeft(boxWidth));
+        lowControls[i]->setBounds(firstControlRowBounds.removeFromLeft(boxWidth));
     }
 
     for (int i = N/2; i < N; i++) {
-        lowButtons[i]->setBounds(secondButtonRowBounds.removeFromLeft(boxWidth));
+        lowControls[i]->setBounds(secondControlRowBounds.removeFromLeft(boxWidth));
     }
 
 }
@@ -164,7 +156,7 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
             //DBG("Alterations[" << String(i) << "]: " << String(p->alterations[i]));
             // fill a ComboBox with the corresponding couple note+alteration
             //lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);
-            lowButtons[boxnum]->setAlteration(i, p->alterations[i]);
+            lowControls[boxnum]->setAlteration(i, p->alterations[i]);
             boxnum++;
         }
 
@@ -175,7 +167,7 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
 
     // reset unused boxes
     for (int i = boxnum; i <= 15; i++)
-        lowButtons[i]->reset();
+        lowControls[i]->reset();
 }
 
 void MidiEffectAudioProcessorEditor::updateAlterations()
@@ -190,14 +182,14 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
     for (int i = 0; i < 15; i++)
     {
         // if the toggle is active
-        if (lowButtons[i]->toggle->getToggleState())
+        if (lowControls[i]->toggle->getToggleState())
         {
             // if the combobox are not in default position
-            if (lowButtons[i]->note->getSelectedId()>1 && lowButtons[i]->alteration->getSelectedId()>1)
+            if (lowControls[i]->note->getSelectedId()>1 && lowControls[i]->alteration->getSelectedId()>1)
             {
                 // C0 = MIDI note #12, alterations starts from 0
-                int j = lowButtons[i]->note->getSelectedId()+10;
-                int alt = lowButtons[i]->alteration->getSelectedId() - 11;
+                int j = lowControls[i]->note->getSelectedId()+10;
+                int alt = lowControls[i]->alteration->getSelectedId() - 11;
                 audioProcessor.alterations.set(j, alt);
                 // ComboBox starts from C1 (#24)
                 DBG("updateAlterations - MIDInote: " << j << " alt: " << alt);

@@ -196,7 +196,7 @@ bool MidiEffectAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 void MidiEffectAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     buffer.clear(); // silence any possible disturbance
-    midiProcessor.process(midiMessages, &pitchWheelValue, &pitchCorrection, alterations, &activeNoteNumber);
+    pitchCorrection = midiProcessor.process(midiMessages, &pitchWheelValue, &pitchCorrection, alterations, &activeNoteNumber);
 }
 
 //==============================================================================
