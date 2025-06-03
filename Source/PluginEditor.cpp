@@ -74,9 +74,10 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     {
         // XXX#3
         lowControls[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
-        lowControls[i]->note->onChange = [this] { updateAlterations(); };
-        lowControls[i]->alteration->onChange = [this] { updateAlterations(); };
-        lowControls[i]->toggle->onStateChange = [this] { updateAlterations(); };
+        lowControls[i]->note->onChange = [this, i] { updateAlteration(i); };
+        lowControls[i]->alteration->onChange = [this, i] { updateAlteration(i); };
+        lowControls[i]->toggle->onStateChange = [this, i] { updateAlteration(i); };
+
         addAndMakeVisible(*lowControls[i]);
     }
     bgImg = ImageFileFormat::loadFrom(BinaryData::Oud_png, BinaryData::Oud_pngSize);
@@ -170,8 +171,13 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
         lowControls[i]->reset();
 }
 
+/**
+ * @brief deprecated: use updateAlteration(int i) instead. Kept for legacy reasons.
+ */
 void MidiEffectAudioProcessorEditor::updateAlterations()
 {
+    DBG("⚠️ Warning: Chiamata a updateAlterations() non prevista");
+    jassertfalse; // trigger in debug se viene invocata
 
     for (int i = 0; i < 128; i++)
     {
@@ -195,5 +201,35 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
                 DBG("updateAlterations - MIDInote: " << j << " alt: " << alt);
             }
         }
+    }
+}
+
+/**
+ * @brief Updates the alteration for the note controlled by LowBox at index i.
+ *
+ * Called when the user changes the toggle, note, or alteration controls.
+ * Updates the corresponding entry in the processor's `alterations` array
+ * if the controls are in a valid state.
+ *
+ * @param i Index of the LowBox (0-based).
+ */
+void MidiEffectAudioProcessorEditor::updateAlteration(int i)
+{
+    // Reset temporaneo della nota target
+    int j = lowControls[i]->note->getSelectedId() + 10;
+
+    if (lowControls[i]->toggle->getToggleState() &&
+        lowControls[i]->note->getSelectedId() > 1 &&
+        lowControls[i]->alteration->getSelectedId() > 1)
+    {
+        int alt = lowControls[i]->alteration->getSelectedId() - 11;
+        audioProcessor.alterations.set(j, alt);
+        DBG("updateAlteration - MIDInote: " << j << " alt: " << alt);
+    }
+    else
+    {
+        // Disattiva se la combo o toggle è inattiva
+        audioProcessor.alterations.set(j, std::numeric_limits<int>::max());
+        DBG("updateAlteration - MIDInote: " << j << " reset");
     }
 }

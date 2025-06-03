@@ -8,7 +8,10 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+// #include <JuceHeader.h>
+// Changed from Projucer to CMake build system
+#include <juce_audio_processors/juce_audio_processors.h>
+#include <juce_gui_basics/juce_gui_basics.h>
 #include "PluginProcessor.h"
 #include "LowBox.h"
 #include "BinaryData.h"
@@ -38,6 +41,7 @@ public:
     void resized() override;
     void updateBoxes(MidiEffectAudioProcessor* p);
     void updateAlterations();
+    void updateAlteration(int i);
 
 private:
     // This reference is provided as a quick way for your editor to

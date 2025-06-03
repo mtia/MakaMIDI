@@ -9,7 +9,9 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
+// #include "JuceHeader.h"
+// Changed from Projucer to CMake build system
+#include <juce_audio_processors/juce_audio_processors.h>
 
 class LowBox : public juce::Component
 {
