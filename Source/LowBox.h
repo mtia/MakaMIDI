@@ -23,7 +23,7 @@ public:
 
     LowBox(juce::AudioProcessorValueTreeState &apvts, int i)
     {
-
+        index = i;
         note = std::make_unique<ComboBox>();
         alteration = std::make_unique<ComboBox>();
         toggle = std::make_unique<ToggleButton>();
@@ -89,12 +89,14 @@ public:
     void setAlteration(int noteNum, int newAlteration)
     {
         note->setSelectedId(noteNum-10);
-
+        /*        // This is the old way of setting the alteration text, now it uses a ComboBox ID
         String * stringAlt = new String();
         if (newAlteration > 0)
             stringAlt->append("+", 1);
         stringAlt->append(String(newAlteration), 2);
         alteration->setText(*stringAlt);
+        */
+        alteration->setSelectedId(newAlteration + 11, juce::NotificationType::dontSendNotification);
         toggle->setToggleState(true, juce::NotificationType::dontSendNotification);
         note->setEnabled(true);
         alteration->setEnabled(true);
@@ -117,6 +119,7 @@ public:
 
     void reset()
     {
+        DBG("Resetting LowBox at index " << index);
         note->setEnabled(false);
         note->setSelectedId(0, juce::NotificationType::dontSendNotification);
         alteration->setEnabled(false);

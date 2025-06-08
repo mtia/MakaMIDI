@@ -8,9 +8,10 @@
 
 #pragma once
 
-// #include <JuceHeader.h>
-// Changed from Projucer to CMake build system
 #include <juce_audio_processors/juce_audio_processors.h>
+
+// Changed from Projucer to CMake build system
+//#include <juce_audio_processors/juce_audio_processors.h>
 #include "MidiProcessor.h"
 
 
@@ -73,6 +74,7 @@ public:
     int pitchCorrection = 0;
     int activeNoteNumber = -1;
     bool exclusive = false;
+    bool readingScale = false;
     juce::Array<int> alterations;
 
 private:
@@ -80,3 +82,5 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiEffectAudioProcessor)
 };
+
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();

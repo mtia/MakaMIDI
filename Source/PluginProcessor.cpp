@@ -11,7 +11,12 @@
 #include "MidiProcessor.h"
 #include "LowBox.h"
 
+/* 
+    @brief
+    returns integer alteration [-9, 9] from the string value, if valid
+*/
 int MidiEffectAudioProcessor::parseCommas(String commas) {
+    // if the field contains N, the alteration is NaN, thus the note is interpreted as not in the scale
     if (commas.indexOf("N")>=0)
         return std::numeric_limits<int>::max();
 
@@ -275,7 +280,7 @@ AudioProcessorValueTreeState::ParameterLayout MidiEffectAudioProcessor::createPa
 
 //==============================================================================
 // This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new MidiEffectAudioProcessor();
 }

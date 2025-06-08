@@ -12,6 +12,9 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     loadBtn.setButtonText("Load scale");
 
     loadBtn.onClick = [this](){
+
+        audioProcessor.readingScale = true;
+
         fileChooser = std::make_unique<juce::FileChooser>("Choose a file",
             audioProcessor.root,
             "*");
@@ -28,9 +31,18 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
                 audioProcessor.readScale(chosenFile);
                 
                 updateBoxes(&audioProcessor);
+
+                for(int i=0; i<16; i++){
+                    updateAlteration(i, true);
+                }
+
+                juce::Timer::callAfterDelay(100, [this] {
+                    audioProcessor.readingScale = false;
+                });
+
             }
             else{
-                // XXX#1
+                // XXX#1 show error message for wrong file format: expected csv
             }
         });
 
@@ -73,13 +85,20 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     for (int i = 0; i < 16; i++)
     {
         // XXX#3
-        lowControls[i] = (i, std::make_unique<LowBox>(audioProcessor.apvts, i + 1));
-        lowControls[i]->note->onChange = [this, i] { updateAlteration(i); };
-        lowControls[i]->alteration->onChange = [this, i] { updateAlteration(i); };
-        lowControls[i]->toggle->onStateChange = [this, i] { updateAlteration(i); };
+        lowControls[i] = std::make_unique<LowBox>(audioProcessor.apvts, i + 1);
+        lowControls[i]->note->onChange = [this, i] {
+            updateAlteration(i, false);
+        };
+        lowControls[i]->alteration->onChange = [this, i] {
+            updateAlteration(i, false);
+        };
+        lowControls[i]->toggle->onClick = [this, i] {
+            updateAlteration(i, false);
+        };
 
         addAndMakeVisible(*lowControls[i]);
     }
+    
     bgImg = ImageFileFormat::loadFrom(BinaryData::Oud_png, BinaryData::Oud_pngSize);
     // bgImg = ImageCache::getFromFile(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile("Oud.png"));
     DBG(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getFullPathName());
@@ -153,11 +172,12 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
     {
         // if there is a record in the alterations
         if (p->alterations[i]!=std::numeric_limits<int>::max()) {
-            DBG("Loading alteration: " + String(p->alterations[i]));
+            DBG("Loading alteration[" << String(i) << "]: " + String(p->alterations[i]));
             //DBG("Alterations[" << String(i) << "]: " << String(p->alterations[i]));
             // fill a ComboBox with the corresponding couple note+alteration
-            //lowButtons[boxnum]->setAlteration(LowBox::noteNumberToName(i), p->alterations[i]);
             lowControls[boxnum]->setAlteration(i, p->alterations[i]);
+            int temp = lowControls[boxnum]->alteration->getSelectedId()-11;
+            DBG("Alteration set for note " << String(i) << ": " << String(temp));
             boxnum++;
         }
 
@@ -213,8 +233,15 @@ void MidiEffectAudioProcessorEditor::updateAlterations()
  *
  * @param i Index of the LowBox (0-based).
  */
-void MidiEffectAudioProcessorEditor::updateAlteration(int i)
+void MidiEffectAudioProcessorEditor::updateAlteration(int i, bool onLoad)
 {
+    if(!onLoad && audioProcessor.readingScale)
+    {
+        // If called on load, skip the update
+        DBG("updateAlteration - Skipped during loading");
+        return;
+    }
+
     // Reset temporaneo della nota target
     int j = lowControls[i]->note->getSelectedId() + 10;
 
