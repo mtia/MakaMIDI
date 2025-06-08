@@ -53,6 +53,7 @@ MidiEffectAudioProcessor::MidiEffectAudioProcessor()
     // Find VST's directory
     root = juce::File::getSpecialLocation(juce::File::currentExecutableFile)
         .getParentDirectory().getParentDirectory().getParentDirectory();
+    alterations.insertMultiple(0, std::numeric_limits<int>::max(), 128);
 }
 
 MidiEffectAudioProcessor::~MidiEffectAudioProcessor()

@@ -92,7 +92,7 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
         lowControls[i]->alteration->onChange = [this, i] {
             updateAlteration(i, false);
         };
-        lowControls[i]->toggle->onClick = [this, i] {
+        lowControls[i]->toggle->onStateChange = [this, i] {
             updateAlteration(i, false);
         };
 
@@ -192,39 +192,6 @@ void MidiEffectAudioProcessorEditor::updateBoxes(MidiEffectAudioProcessor* p)
 }
 
 /**
- * @brief deprecated: use updateAlteration(int i) instead. Kept for legacy reasons.
- */
-void MidiEffectAudioProcessorEditor::updateAlterations()
-{
-    DBG("⚠️ Warning: Chiamata a updateAlterations() non prevista");
-    jassertfalse; // trigger in debug se viene invocata
-
-    for (int i = 0; i < 128; i++)
-    {
-        audioProcessor.alterations.set(i, std::numeric_limits<int>::max());
-    }
-
-    // for each control box
-    for (int i = 0; i < 15; i++)
-    {
-        // if the toggle is active
-        if (lowControls[i]->toggle->getToggleState())
-        {
-            // if the combobox are not in default position
-            if (lowControls[i]->note->getSelectedId()>1 && lowControls[i]->alteration->getSelectedId()>1)
-            {
-                // C0 = MIDI note #12, alterations starts from 0
-                int j = lowControls[i]->note->getSelectedId()+10;
-                int alt = lowControls[i]->alteration->getSelectedId() - 11;
-                audioProcessor.alterations.set(j, alt);
-                // ComboBox starts from C1 (#24)
-                DBG("updateAlterations - MIDInote: " << j << " alt: " << alt);
-            }
-        }
-    }
-}
-
-/**
  * @brief Updates the alteration for the note controlled by LowBox at index i.
  *
  * Called when the user changes the toggle, note, or alteration controls.
@@ -252,6 +219,7 @@ void MidiEffectAudioProcessorEditor::updateAlteration(int i, bool onLoad)
         int alt = lowControls[i]->alteration->getSelectedId() - 11;
         audioProcessor.alterations.set(j, alt);
         DBG("updateAlteration - MIDInote: " << j << " alt: " << alt);
+        DBG("\t\t\t\t: " << lowControls[i]->note->getText() << " alt: " << audioProcessor.alterations[j]);
     }
     else
     {
