@@ -1,31 +1,71 @@
-# MakaMIDI
-Adjust MIDI message pitch according to makam scales (Monophonic single-channel use)
+# MakaMIDI  
+Adjust MIDI pitch according to Turkish Makam scales (monophonic, single MIDI channel)
 
 ![plot](screenshot.PNG)
 
+---
 
-## Instructions
+## Overview
 
-Insert the plugin into a MIDI track of a DAW. Activate the alterations menù through the toggle buttons and select the note and the alteration in commas. Once the menus are set and active, the plugin should be already altering the pitch of the incoming notes.
+MakaMIDI is a MIDI VST3 plugin designed to alter the pitch of incoming MIDI notes according to Turkish Makam microtonal scales. The plugin works monophonically on a single MIDI channel, providing precise pitch alterations with support for custom scales.
 
-### Turkish makam model and commas
+---
 
-<p align="center">
-  <img src="commas.gif" width="350">
+## How to Use
+
+1. Insert the plugin on a MIDI track or MIDI effect slot in your DAW.  
+2. Enable the **Alterations** menu via the toggle buttons in the GUI.  
+3. Select the note and the pitch alteration in commas (microtonal units).  
+4. Once set, the plugin will alter the pitch of incoming MIDI notes accordingly.
+
+---
+
+## Turkish Makam Model and Commas
+
+<p align="center">  
+  <img src="commas.gif" width="350" alt="Microtonal commas illustration">  
 </p>
 
-The model shown in the picture above represents the partition of a whole tone in 9 equal commas to handle microtonal pitch variations.
-See https://en.wikipedia.org/wiki/Turkish_makam
+This model divides a whole tone into 9 equal commas to handle microtonal pitch variations, based on the Turkish Makam system.  
+For more details, see [Turkish makam - Wikipedia](https://en.wikipedia.org/wiki/Turkish_makam).
 
-### Load scale
+---
 
-Load a preset of alterations from a csv file. See sample files Rast.csv and Saba.csv from this folder. The new alterations will overwrite the previously selected ones.
-If more than 10 alterations are present, they won't be shown in the ComboBoxes but they will be effective.
-\
-Alteration = 0 &nbsp; &nbsp; &nbsp; --> note present in the scale unaltered \
-Alteration = NaN &nbsp;--> note not in scale (see Exclusive mode)
+## Loading Scales
 
-### Exclusive mode
+You can load custom pitch alteration presets from CSV files (e.g., `Rast.csv` and `Saba.csv` included). Loading a new CSV will overwrite the current alterations.
 
-By pressing the button in the upper-right corner you'll enter the "Exclusive mode". The button turns red indicating the mode is active.
-This mode will mute every note not specified in the alterations. To play an unaltered note, specify zero as alteration.
+- If more than 10 alterations exist, only the first 10 will appear in the ComboBoxes, but all will be active.  
+- Alteration value `0` means the note is present unaltered in the scale.  
+- Alteration value `NaN` means the note is excluded (see **Exclusive Mode**).
+
+---
+
+## Exclusive Mode
+
+Activate **Exclusive Mode** by pressing the red toggle button in the upper-right corner of the GUI.
+
+- When enabled, all notes **not specified** in the alterations will be muted.  
+- To play an unaltered note in this mode, set its alteration value to `0`.
+
+---
+
+## Installation
+
+- Copy the `.vst3` plugin folder into your system’s VST3 directory (e.g., `C:\VstPlugins` on Windows).  
+- Rescan plugins in your DAW.  
+- Load the plugin on a MIDI track before your MIDI synthesizer.
+
+---
+
+## Notes
+
+- The plugin is designed for **VST3 only**.  
+- The pitch wheel range of your MIDI synth should be set to **1 octave** for accurate pitch bending corresponding to the Turkish Makam system.  
+- Currently, the plugin supports **monophonic** MIDI processing only (one note at a time).
+
+---
+
+## Feedback and Contributions
+
+Please report bugs or request features by opening an issue on the GitHub repository. Contributions are welcome!

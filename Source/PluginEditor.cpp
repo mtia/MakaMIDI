@@ -84,7 +84,6 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     
     for (int i = 0; i < 16; i++)
     {
-        // XXX#3
         lowControls[i] = std::make_unique<LowBox>(audioProcessor.apvts, i + 1);
         lowControls[i]->note->onChange = [this, i] {
             updateAlteration(i, false);
