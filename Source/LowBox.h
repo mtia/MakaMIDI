@@ -1,6 +1,11 @@
 /*
   ==============================================================================
 
+    MakaMIDI
+    Copyright (c) 2025 Mattia Vassena
+    Licensed under the MIT License.
+    See LICENSE file in the project root for full license information.
+
     LowBox.h
     Created: 21 Aug 2023 4:51:04pm
     Author:  Mattia

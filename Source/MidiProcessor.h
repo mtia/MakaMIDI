@@ -1,6 +1,11 @@
 /*
   ==============================================================================
 
+    MakaMIDI
+    Copyright (c) 2025 Mattia Vassena
+    Licensed under the MIT License.
+    See LICENSE file in the project root for full license information.
+
     MidiProcessor.h
     Created: 2 Aug 2023 12:16:46pm
     Author:  Mattia

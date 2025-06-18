@@ -1,3 +1,15 @@
+/*
+  ==============================================================================
+
+    MakaMIDI
+    Copyright (c) 2025 Mattia Vassena
+    Licensed under the MIT License.
+    See LICENSE file in the project root for full license information.
+
+    PluginEditor.cpp
+
+  ==============================================================================
+*/
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -25,7 +37,7 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
 
         fileChooser->launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser) {
             juce::File chosenFile(chooser.getResult());
-            if (chosenFile.getFileExtension() == ".csv") {
+            if (chosenFile.getFileExtension().toLowerCase() == ".csv") {
                 audioProcessor.savedFile = chosenFile;
                 audioProcessor.root = chosenFile.getParentDirectory().getFullPathName();
                 audioProcessor.readScale(chosenFile);
@@ -42,7 +54,9 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
 
             }
             else{
-                // XXX#1 show error message for wrong file format: expected csv
+                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon,
+                                 "Invalid file",
+                                 "Please select a CSV file.");
             }
         });
 

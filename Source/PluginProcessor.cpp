@@ -1,7 +1,10 @@
 /*
   ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
+    MakaMIDI
+    Copyright (c) 2025 Mattia Vassena
+    Licensed under the MIT License.
+    See LICENSE file in the project root for full license information.
 
   ==============================================================================
 */
