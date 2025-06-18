@@ -232,6 +232,7 @@ void MidiEffectAudioProcessor::setStateInformation(const void* data, int sizeInB
 
     for (int i = 0; i < 128; ++i)
         alterations.set(i, stream.readInt());
+
 }
 
 

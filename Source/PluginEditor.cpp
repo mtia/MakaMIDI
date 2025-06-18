@@ -104,6 +104,9 @@ MidiEffectAudioProcessorEditor::MidiEffectAudioProcessorEditor (MidiEffectAudioP
     DBG(File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getFullPathName());
     DBG(File::getCurrentWorkingDirectory().getFullPathName());
     setSize (800, 300);
+
+    // for persistence of the GUI when the plugin window gets closed
+    updateBoxes(&audioProcessor);
 }
 
 MidiEffectAudioProcessorEditor::~MidiEffectAudioProcessorEditor()
