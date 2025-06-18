@@ -69,8 +69,11 @@ Activate **Exclusive Mode** by pressing the red toggle button in the upper-right
 ### Author
 
 Mattia Vassena
+
 [Website](https://sites.google.com/view/mattiavassena-en/home)
+
 [GitHub @mtia](https://github.com/mtia)  
+
 📧 mattia_vassena@yahoo.com
 
 ### References
