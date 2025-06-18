@@ -217,18 +217,23 @@ juce::AudioProcessorEditor* MidiEffectAudioProcessor::createEditor()
 }
 
 //==============================================================================
-void MidiEffectAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void MidiEffectAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    juce::MemoryOutputStream stream(destData, true);
+
+    for (int i = 0; i < 128; ++i)
+        stream.writeInt(alterations[i]);
 }
 
-void MidiEffectAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+
+void MidiEffectAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    juce::MemoryInputStream stream(data, static_cast<size_t>(sizeInBytes), false);
+
+    for (int i = 0; i < 128; ++i)
+        alterations.set(i, stream.readInt());
 }
+
 
 
 juce::StringArray listAlterationsInCommas()
