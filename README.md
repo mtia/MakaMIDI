@@ -66,6 +66,19 @@ Activate **Exclusive Mode** by pressing the red toggle button in the upper-right
 
 ---
 
+## Comparison, Integration, and Limitations
+
+### Comparison with `.scl` files
+Unlike `.scl` files, which define tuning only within one octave and rely on octave repetition, MakaMIDI allows custom microtonal mappings that can reflect more complex tuning systems and non-octave repeating scales. This provides greater flexibility for traditional makam scales where octave equivalence is not always strictly followed.
+
+### Integration with VST Synths
+To work correctly, MakaMIDI requires the downstream synth to support MIDI Pitch Wheel messages and have its Pitch Wheel Range set to **1 whole tone**. This ensures accurate microtonal pitch shifts per note, as MakaMIDI uses fine pitch bend values to realize microtonal alterations.
+
+### Limitations
+- **Monophony**: MakaMIDI is monophonic in microtonal handling. True microtonal polyphony would require more advanced protocols such as **MPE (MIDI Polyphonic Expression)** or alternative hardware/software approaches.
+- **Playing style**: Some traditional makam ornaments and expressive techniques are impossible to replicate with just a standard MIDI microtonal mapping. Some players use pitchwheel to manually adjust the pitch, but with MakaMIDI the manual action on the physical wheel can be reduced, addressing only expressivity and not pitch adjustment.
+- **Pitch fluctuation**: In makam practice, pitches can subtly fluctuate (e.g., lowered notes on descending scales, raised on ascending). These dynamic pitch nuances are not captured by static tuning maps.
+
 ### Author
 
 Mattia Vassena
